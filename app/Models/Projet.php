@@ -16,5 +16,10 @@ class Projet extends Model
         return $this->hasMany(Colonne::class);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
+
     protected $fillable = ['nom', 'description'];
 }
