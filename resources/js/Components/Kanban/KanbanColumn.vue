@@ -1,14 +1,11 @@
 <script setup>
+import draggable from 'vuedraggable'
 import TaskCard from './TaskCard.vue'
 
-defineProps({
+const props = defineProps({
   colonne: {
     type: Object,
     required: true
-  },
-  taches: {
-    type: Array,
-    default: () => []
   },
   users: {
     type: Array,
@@ -16,8 +13,21 @@ defineProps({
   }
 })
 
+const taches = defineModel('taches', { default: () => [] })
+
+const emit = defineEmits(['task-moved'])
+
 function findUser(userId, users) {
   return users.find(u => u.id === userId) ?? null
+}
+
+function onChange(event) {
+  if (event.added) {
+    emit('task-moved', {
+      tache: event.added.element,
+      nouvelleColonne: props.colonne
+    })
+  }
 }
 </script>
 
@@ -29,16 +39,23 @@ function findUser(userId, users) {
         {{ taches.length }}
       </span>
     </div>
-    <div class="flex flex-col gap-2">
-      <TaskCard
-        v-for="tache in taches"
-        :key="tache.id"
-        :tache="tache"
-        :assigne="findUser(tache.userId, users)"
-      />
-      <p v-if="taches.length === 0" class="text-xs text-gray-400 text-center py-4">
-        Aucune tâche
-      </p>
-    </div>
+    <draggable
+      v-model="taches"
+      group="taches"
+      item-key="id"
+      class="flex flex-col gap-2 min-h-[40px]"
+      ghost-class="opacity-40"
+      @change="onChange"
+    >
+      <template #item="{ element }">
+        <TaskCard
+          :tache="element"
+          :assigne="findUser(element.userId, users)"
+        />
+      </template>
+    </draggable>
+    <p v-if="taches.length === 0" class="text-xs text-gray-400 text-center py-4">
+      Aucune tâche
+    </p>
   </div>
 </template>

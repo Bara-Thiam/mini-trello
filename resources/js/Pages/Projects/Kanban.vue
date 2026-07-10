@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { reactive, computed } from 'vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import KanbanColumn from '@/Components/Kanban/KanbanColumn.vue'
 import mockData from '@/mock-data.json'
@@ -11,7 +11,6 @@ const props = defineProps({
   }
 })
 
-// Ordre 1,2,3 des colonnes correspond aux statuts TODO/DOING/DONE
 const ORDRE_TO_STATUT = { 1: 'TODO', 2: 'DOING', 3: 'DONE' }
 
 const projet = computed(() =>
@@ -24,11 +23,19 @@ const colonnesDuProjet = computed(() =>
     .sort((a, b) => a.ordre - b.ordre)
 )
 
-function tachesPourColonne(colonne) {
+// Un tableau réactif STABLE par colonne (indispensable pour vuedraggable)
+const tachesByColonne = reactive({})
+colonnesDuProjet.value.forEach(colonne => {
   const statut = ORDRE_TO_STATUT[colonne.ordre]
-  return mockData.taches.filter(
+  tachesByColonne[colonne.id] = mockData.taches.filter(
     t => t.projetId === props.projetId && t.statut === statut
   )
+})
+
+function onTaskMoved({ tache, nouvelleColonne }) {
+  const nouveauStatut = ORDRE_TO_STATUT[nouvelleColonne.ordre]
+  tache.statut = nouveauStatut
+  // TODO: PATCH /tasks/{id}/status une fois l'API prête (voir accord technique point 3)
 }
 </script>
 
@@ -39,8 +46,9 @@ function tachesPourColonne(colonne) {
         v-for="colonne in colonnesDuProjet"
         :key="colonne.id"
         :colonne="colonne"
-        :taches="tachesPourColonne(colonne)"
+        v-model:taches="tachesByColonne[colonne.id]"
         :users="mockData.users"
+        @task-moved="onTaskMoved"
       />
     </div>
   </AppLayout>
