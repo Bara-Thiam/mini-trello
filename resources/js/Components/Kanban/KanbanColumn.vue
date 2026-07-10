@@ -7,15 +7,17 @@ const props = defineProps({
     type: Object,
     required: true
   },
+  taches: {
+    type: Array,
+    required: true
+  },
   users: {
     type: Array,
     default: () => []
   }
 })
 
-const taches = defineModel('taches', { default: () => [] })
-
-const emit = defineEmits(['task-moved'])
+const emit = defineEmits(['task-moved', 'edit-task'])
 
 function findUser(userId, users) {
   return users.find(u => u.id === userId) ?? null
@@ -40,7 +42,7 @@ function onChange(event) {
       </span>
     </div>
     <draggable
-      v-model="taches"
+      :list="taches"
       group="taches"
       item-key="id"
       class="flex flex-col gap-2 min-h-[40px]"
@@ -51,6 +53,7 @@ function onChange(event) {
         <TaskCard
           :tache="element"
           :assigne="findUser(element.userId, users)"
+          @click="emit('edit-task', element)"
         />
       </template>
     </draggable>
