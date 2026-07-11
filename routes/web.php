@@ -5,7 +5,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\TacheController;
 use App\Http\Controllers\DashboardController;
-use Illuminate\Support\Facades\Broadcast;
 
 Route::get('/', function () {
     return redirect('/projects');
@@ -13,7 +12,7 @@ Route::get('/', function () {
 
 Route::get('/register', [AuthController::class, 'showRegister']);
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/login', [AuthController::class, 'showLogin']);
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -30,8 +29,4 @@ Route::middleware('auth')->group(function () {
     Route::patch('/taches/{tache}/statut', [TacheController::class, 'updateStatus']);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
-});
-
-Broadcast::channel('user.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
 });
