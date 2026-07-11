@@ -46,6 +46,7 @@ class ProjetController extends Controller
             'projet' => new ProjetResource($projet),
             'colonnes' => $projet->colonnes()->orderBy('ordre')->get(),
             'taches' => TacheResource::collection($projet->taches()->with('user')->get()),
+            'users' => $projet->users()->get(['users.id', 'users.name']),
         ]);
     }
 

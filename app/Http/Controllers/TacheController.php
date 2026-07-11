@@ -7,6 +7,7 @@ use App\Models\Projet;
 use App\Models\Tache;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Inertia\Inertia;
 
 class TacheController extends Controller
 {
@@ -42,7 +43,7 @@ class TacheController extends Controller
         $tache->update($validated);
 
         if (isset($validated['user_id']) && $tache->wasChanged('user_id') && $tache->user_id) {
-            event(new \App\Events\TacheAssignee($tache));
+            $tache->user->notify(new \App\Notifications\TacheAssigneeNotification($tache));
         }
 
         return redirect("/projects/{$tache->projet_id}");
@@ -69,5 +70,16 @@ class TacheController extends Controller
         $tache->update($validated);
 
         return new TacheResource($tache);
+    }
+
+    public function mine(Request $request)
+    {
+        $taches = Tache::where('user_id', $request->user()->id)
+            ->with('projet')
+            ->get();
+
+        return Inertia::render('Tasks/MyTasks', [
+            'taches' => TacheResource::collection($taches),
+        ]);
     }
 }

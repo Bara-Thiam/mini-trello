@@ -2,21 +2,21 @@
 
 namespace Tests\Feature;
 
-use App\Events\TacheAssignee;
 use App\Models\Projet;
 use App\Models\Tache;
 use App\Models\User;
+use App\Notifications\TacheAssigneeNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class TacheAssigneeTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_assigner_une_tache_declenche_levenement(): void
+    public function test_assigner_une_tache_envoie_une_notification(): void
     {
-        Event::fake();
+        Notification::fake();
 
         $projet = Projet::factory()->create();
         $chef = User::factory()->create(['role' => 'chef_projet']);
@@ -27,15 +27,12 @@ class TacheAssigneeTest extends TestCase
             'user_id' => $membre->id,
         ]);
 
-        Event::assertDispatched(TacheAssignee::class, function ($event) use ($tache, $membre) {
-            return $event->tache->id === $tache->id
-                && $event->tache->user_id === $membre->id;
-        });
+        Notification::assertSentTo($membre, TacheAssigneeNotification::class);
     }
 
-    public function test_modifier_le_titre_sans_changer_lassignation_ne_declenche_rien(): void
+    public function test_modifier_le_titre_sans_changer_lassignation_nenvoie_rien(): void
     {
-        Event::fake();
+        Notification::fake();
 
         $projet = Projet::factory()->create();
         $membre = User::factory()->create(['role' => 'membre']);
@@ -48,6 +45,6 @@ class TacheAssigneeTest extends TestCase
             'titre' => 'Nouveau titre',
         ]);
 
-        Event::assertNotDispatched(TacheAssignee::class);
+        Notification::assertNothingSent();
     }
 }

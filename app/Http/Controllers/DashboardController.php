@@ -16,9 +16,13 @@ class DashboardController extends Controller
         $projets = $user->role === 'admin' ? Projet::all() : $user->projets;
         $projetIds = $projets->pluck('id');
 
+        $toutesLesTaches = \App\Models\Tache::whereIn('projet_id', $projetIds)->get();
+
         $parProjet = $projets->map(fn ($projet) => [
             'id' => $projet->id,
             'nom' => $projet->nom,
+            'total' => $projet->taches->count(),
+            'done' => $projet->taches->where('statut', 'DONE')->count(),
             'progression' => $projet->progression(),
             'tauxPrioriteHaute' => $projet->tauxPrioriteHaute(),
         ]);
@@ -29,6 +33,11 @@ class DashboardController extends Controller
             ->map(fn ($u) => ['userId' => $u->id, 'name' => $u->name, 'tasksCount' => $u->taches_count]);
 
         return Inertia::render('Dashboard/Index', [
+            'totalProjets' => $projets->count(),
+            'totalTaches' => $toutesLesTaches->count(),
+            'tachesTerminees' => $toutesLesTaches->where('statut', 'DONE')->count(),
+            'tachesEnCours' => $toutesLesTaches->where('statut', 'DOING')->count(),
+            'tachesATaire' => $toutesLesTaches->where('statut', 'TODO')->count(),
             'parProjet' => $parProjet,
             'parMembre' => $parMembre,
         ]);

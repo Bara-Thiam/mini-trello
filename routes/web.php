@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\TacheController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return redirect('/projects');
@@ -29,4 +30,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/taches/{tache}/statut', [TacheController::class, 'updateStatus']);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    Route::get('/tasks/mine', [TacheController::class, 'mine']);
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/lue', [NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/tout-lu', [NotificationController::class, 'markAllAsRead']);
 });
