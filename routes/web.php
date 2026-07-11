@@ -22,6 +22,10 @@ Route::get('/tasks/mine', function () {
     return Inertia::render('Tasks/MyTasks');
 });
 
+Route::get('/notifications', function () {
+    return Inertia::render('Notifications/Index');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Index');
 });
