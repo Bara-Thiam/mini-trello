@@ -1,51 +1,41 @@
 <script setup>
-defineProps({
-    taches: Array,
-})
+import AppLayout from '@/Layouts/AppLayout.vue'
 
-function getStatutClass(statut) {
-    if (statut === "DONE") return "bg-green-100 text-green-700";
-    if (statut === "DOING") return "bg-yellow-100 text-yellow-700";
-    return "bg-gray-100 text-gray-600";
-}
+defineProps({ taches: Array })
 
-function getPrioriteClass(priorite) {
-    if (priorite === "HIGH") return "bg-red-100 text-red-600";
-    return "bg-blue-100 text-blue-600";
-}
+const PRIORITE_STYLES = { HIGH: 'bg-coral/10 text-coral', MEDIUM: 'bg-amber/10 text-amber', LOW: 'bg-mint/10 text-mint' }
+const STATUT_STYLES = { DONE: 'bg-mint/10 text-mint', DOING: 'bg-amber/10 text-amber', TODO: 'bg-brand-50 text-ink-soft' }
+function prioriteClass(p) { return PRIORITE_STYLES[p] ?? 'bg-brand-50 text-ink-soft' }
+function statutClass(s) { return STATUT_STYLES[s] ?? 'bg-brand-50 text-ink-soft' }
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-100">
-        <div class="max-w-4xl mx-auto px-6 py-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Mes Tâches</h2>
+    <AppLayout title="Mes tâches">
+        <div v-if="taches.length === 0" class="text-center py-20">
+            <p class="font-display text-lg font-semibold text-ink mb-1">Aucune tâche assignée</p>
+            <p class="text-ink-soft">Les tâches qu'on vous confie apparaîtront ici.</p>
+        </div>
 
-            <div v-if="taches.length === 0" class="text-center text-gray-400 mt-12">
-                Aucune tâche assignée pour l'instant.
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 16px">
-                <div v-for="tache in taches" :key="tache.id" class="bg-white rounded-lg shadow p-5">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px">
-                        <h3 class="text-base font-semibold text-gray-800">{{ tache.titre }}</h3>
-                        <div style="display: flex; gap: 8px; margin-left: 16px">
-                            <span :class="['text-xs font-medium px-2 py-1 rounded-full', getStatutClass(tache.statut)]">
-                                {{ tache.statut }}
-                            </span>
-                            <span :class="['text-xs font-medium px-2 py-1 rounded-full', getPrioriteClass(tache.priorite)]">
-                                {{ tache.priorite }}
-                            </span>
-                        </div>
+        <div class="flex flex-col gap-3">
+            <div v-for="tache in taches" :key="tache.id" class="bg-white rounded-xl border border-brand-100 p-5 shadow-[0_2px_10px_rgba(30,27,46,0.06)]">
+                <div class="flex items-start justify-between gap-4 mb-1.5">
+                    <h3 class="font-display text-base font-semibold text-ink">{{ tache.titre }}</h3>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <span :class="['text-[11px] font-medium px-2 py-1 rounded-full', statutClass(tache.statut)]">{{ tache.statut }}</span>
+                        <span :class="['text-[11px] font-medium px-2 py-1 rounded-full', prioriteClass(tache.priorite)]">{{ tache.priorite }}</span>
                     </div>
-
-                    <p class="text-sm text-gray-500 mb-3">{{ tache.description }}</p>
-
-                    <div style="display: flex; justify-content: space-between" class="text-xs text-gray-400">
-                        <span>📁 {{ tache.projet?.nom ?? 'Projet inconnu' }}</span>
-                        <span>📅 {{ tache.echeance }}</span>
-                    </div>
+                </div>
+                <p class="text-sm text-ink-soft mb-3">{{ tache.description }}</p>
+                <div class="flex items-center justify-between text-xs text-ink-soft pt-3 border-t border-brand-50">
+                    <span class="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3.5 h-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-19.5 0v6a2.25 2.25 0 002.25 2.25h15a2.25 2.25 0 002.25-2.25v-6m-19.5 0h19.5M4.5 9.75V6a2.25 2.25 0 012.25-2.25h3.879a1.5 1.5 0 011.06.44l1.72 1.72a1.5 1.5 0 001.06.44H19.5A2.25 2.25 0 0121.75 9.75" />
+                        </svg>
+                        {{ tache.projet?.nom ?? 'Projet inconnu' }}
+                    </span>
+                    <span class="font-mono">{{ tache.echeance }}</span>
                 </div>
             </div>
         </div>
-    </div>
+    </AppLayout>
 </template>
