@@ -14,11 +14,11 @@ class TacheSeeder extends Seeder
         $refonte = Projet::where('nom', 'Refonte site vitrine')->firstOrFail();
         $appMobile = Projet::where('nom', 'App mobile interne')->firstOrFail();
 
-        $bara = User::where('email', 'bara@mail.com')->firstOrFail();
-        $awa = User::where('email', 'joanelle@mail.com')->firstOrFail();
-        $mactar = User::where('email', 'mactar@mail.com')->firstOrFail();
-        $fatou = User::where('email', 'fatou@mail.com')->firstOrFail();
-        $ibrahima = User::where('email', 'ibrahima@mail.com')->firstOrFail();
+        $bara = User::where('email', 'bara@gmail.com')->firstOrFail();
+        $awa = User::where('email', 'joanelle@gmail.com')->firstOrFail();
+        $mactar = User::where('email', 'mactar@gmail.com')->firstOrFail();
+        $fatou = User::where('email', 'fatou@gmail.com')->firstOrFail();
+        $abdoulaye = User::where('email', 'abdoulaye@gmail.com')->firstOrFail(); // ou abdoulaye@gmail.com — à confirmer
 
         Tache::create([
             'projet_id' => $refonte->id,
@@ -92,7 +92,7 @@ class TacheSeeder extends Seeder
 
         Tache::create([
             'projet_id' => $refonte->id,
-            'user_id' => $ibrahima->id,
+            'user_id' => $abdoulaye->id,
             'titre' => 'Réviser les permissions admin',
             'description' => 'Vérification des accès par rôle',
             'statut' => 'TODO',
@@ -112,7 +112,7 @@ class TacheSeeder extends Seeder
 
         Tache::create([
             'projet_id' => $appMobile->id,
-            'user_id' => $ibrahima->id,
+            'user_id' => $abdoulaye->id,
             'titre' => 'Valider le déploiement',
             'description' => 'Checklist de mise en production',
             'statut' => 'TODO',

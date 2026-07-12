@@ -17,8 +17,11 @@ class TacheController extends Controller
 
         $validated = $request->validate([
             'titre' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'user_id' => 'nullable|exists:users,id',
+            'description' => 'nullable|string|max:2000',
+            'user_id' => [
+                'nullable',
+                Rule::exists('projet_user', 'user_id')->where('projet_id', $projet->id),
+            ],
             'priorite' => ['sometimes', Rule::in(['LOW', 'MEDIUM', 'HIGH'])],
             'echeance' => 'nullable|date',
         ]);
@@ -34,8 +37,11 @@ class TacheController extends Controller
 
         $validated = $request->validate([
             'titre' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'user_id' => 'nullable|exists:users,id',
+            'description' => 'nullable|string|max:2000',
+            'user_id' => [
+                'nullable',
+                Rule::exists('projet_user', 'user_id')->where('projet_id', $tache->projet_id),
+            ],
             'priorite' => ['sometimes', Rule::in(['LOW', 'MEDIUM', 'HIGH'])],
             'echeance' => 'nullable|date',
         ]);

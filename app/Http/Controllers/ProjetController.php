@@ -35,6 +35,10 @@ class ProjetController extends Controller
         $projet = Projet::create($validated);
         $projet->users()->attach($request->user()->id);
 
+        foreach ([['nom' => 'ToDo', 'ordre' => 1], ['nom' => 'Doing', 'ordre' => 2], ['nom' => 'Done', 'ordre' => 3]] as $colonne) {
+            $projet->colonnes()->create($colonne);
+        }
+
         return redirect('/projects');
     }
 

@@ -21,10 +21,11 @@ class ProjetControllerTest extends TestCase
 
         $response = $this->actingAs($user)->get('/projects');
 
-        $response->assertInertia(fn (Assert $page) => $page
-            ->component('Projects/Index', shouldExist: false)
-            ->has('projets', 1)
-            ->where('projets.0.id', $projetA->id)
+        $response->assertInertia(
+            fn(Assert $page) => $page
+                ->component('Projects/Index', shouldExist: false)
+                ->has('projets', 1)
+                ->where('projets.0.id', $projetA->id)
         );
     }
 
@@ -35,9 +36,10 @@ class ProjetControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/projects');
 
-        $response->assertInertia(fn (Assert $page) => $page
-            ->component('Projects/Index', shouldExist: false)
-            ->has('projets', 3)
+        $response->assertInertia(
+            fn(Assert $page) => $page
+                ->component('Projects/Index', shouldExist: false)
+                ->has('projets', 3)
         );
     }
 
@@ -65,5 +67,16 @@ class ProjetControllerTest extends TestCase
 
         $projet = Projet::where('nom', 'Nouveau projet')->first();
         $this->assertTrue($projet->users->contains($chef));
+    }
+
+    public function test_creer_un_projet_genere_les_trois_colonnes_par_defaut(): void
+    {
+        $chef = User::factory()->create(['role' => 'chef_projet']);
+
+        $this->actingAs($chef)->post('/projects', ['nom' => 'Test colonnes']);
+
+        $projet = Projet::where('nom', 'Test colonnes')->first();
+        $this->assertCount(3, $projet->colonnes);
+        $this->assertEquals(['ToDo', 'Doing', 'Done'], $projet->colonnes()->orderBy('ordre')->pluck('nom')->toArray());
     }
 }

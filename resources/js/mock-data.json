@@ -1,10 +1,10 @@
 {
   "users": [
-    { "id": 1, "name": "Sereigne Bara Thiam", "email": "bara@mail.com", "role": "chef_projet" },
-    { "id": 2, "name": "Joanelle Aholou-Kotiko", "email": "joanelle@mail.com", "role": "membre" },
-    { "id": 3, "name": "Mactar Camara", "email": "mactar@mail.com", "role": "membre" },
-    { "id": 4, "name": "Fatou Sarr", "email": "fatou@mail.com", "role": "membre" },
-    { "id": 5, "name": "Ibrahima Fall", "email": "ibrahima@mail.com", "role": "admin" }
+    { "id": 1, "name": "Sereigne Bara Thiam", "email": "bara@gmail.com", "role": "chef_projet" },
+    { "id": 2, "name": "Joanelle Aholou-Kotiko", "email": "joanelle@gmail.com", "role": "membre" },
+    { "id": 3, "name": "Mactar Camara", "email": "mactar@gmail.com", "role": "membre" },
+    { "id": 4, "name": "Fatou Sarr", "email": "fatou@gmail.com", "role": "membre" },
+    { "id": 5, "name": "Abdoulaye Diallo", "email": "abdoulaye@gmail.com", "role": "admin" }
   ],
   "projets": [
     {

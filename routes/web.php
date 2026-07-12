@@ -6,6 +6,7 @@ use App\Http\Controllers\ProjetController;
 use App\Http\Controllers\TacheController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\InvitationController;
 
 Route::get('/', function () {
     return redirect('/projects');
@@ -36,4 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::post('/notifications/{id}/lue', [NotificationController::class, 'markAsRead']);
     Route::post('/notifications/tout-lu', [NotificationController::class, 'markAllAsRead']);
+
+    Route::post('/projects/{projet}/invitations', [InvitationController::class, 'store']);
+    Route::post('/notifications/{notification}/accepter', [InvitationController::class, 'accepter']);
+    Route::post('/notifications/{notification}/refuser', [InvitationController::class, 'refuser']);
 });

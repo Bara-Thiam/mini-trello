@@ -11,35 +11,35 @@ class UserSeeder extends Seeder
     {
         User::create([
             'name' => 'Sereigne Bara Thiam',
-            'email' => 'bara@mail.com',
+            'email' => 'bara@gmail.com',
             'password' => 'password',
             'role' => 'chef_projet',
         ]);
 
         User::create([
             'name' => 'Joanelle Aholou-Kotiko',
-            'email' => 'joanelle@mail.com',
+            'email' => 'joanelle@gmail.com',
             'password' => 'password',
             'role' => 'membre',
         ]);
 
         User::create([
             'name' => 'Mactar Camara',
-            'email' => 'mactar@mail.com',
+            'email' => 'mactar@gmail.com',
             'password' => 'password',
             'role' => 'membre',
         ]);
 
         User::create([
             'name' => 'Fatou Sarr',
-            'email' => 'fatou@mail.com',
+            'email' => 'fatou@gmail.com',
             'password' => 'password',
             'role' => 'membre',
         ]);
 
         User::create([
-            'name' => 'Ibrahima Fall',
-            'email' => 'ibrahima@mail.com',
+            'name' => 'Abdoulaye Diallo',
+            'email' => 'abdoulaye@gmail.com',
             'password' => 'password',
             'role' => 'admin',
         ]);

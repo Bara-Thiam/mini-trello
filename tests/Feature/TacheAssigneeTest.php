@@ -21,6 +21,7 @@ class TacheAssigneeTest extends TestCase
         $projet = Projet::factory()->create();
         $chef = User::factory()->create(['role' => 'chef_projet']);
         $membre = User::factory()->create(['role' => 'membre']);
+        $projet->users()->attach([$chef->id, $membre->id]);
         $tache = Tache::factory()->create(['projet_id' => $projet->id, 'user_id' => null]);
 
         $this->actingAs($chef)->put("/taches/{$tache->id}", [
