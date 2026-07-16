@@ -3,8 +3,6 @@
 namespace App\Notifications;
 
 use App\Models\Tache;
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
@@ -31,10 +29,5 @@ class TacheAssigneeNotification extends Notification
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toDatabase($notifiable));
-    }
-
-    public function broadcastOn(): array
-    {
-        return [new PrivateChannel('App.Models.User.' . $this->tache->user_id)];
     }
 }

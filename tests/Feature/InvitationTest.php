@@ -6,6 +6,7 @@ use App\Models\Projet;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\Tache;
 
 class InvitationTest extends TestCase
 {
@@ -117,5 +118,30 @@ class InvitationTest extends TestCase
 
         $response->assertSessionHasErrors('email');
         $this->assertEquals(1, $cible->notifications()->count());
+    }
+
+    public function test_un_chef_de_projet_peut_retirer_un_membre(): void
+    {
+        $projet = Projet::factory()->create();
+        $chef = User::factory()->create(['role' => 'chef_projet']);
+        $membre = User::factory()->create(['role' => 'membre']);
+        $projet->users()->attach([$chef->id, $membre->id]);
+        $tache = Tache::factory()->create(['projet_id' => $projet->id, 'user_id' => $membre->id]);
+
+        $this->actingAs($chef)->delete("/projects/{$projet->id}/membres/{$membre->id}");
+
+        $this->assertFalse($projet->fresh()->users->contains($membre));
+        $this->assertNull($tache->fresh()->user_id);
+    }
+
+    public function test_on_ne_peut_pas_retirer_le_dernier_membre_dun_projet(): void
+    {
+        $projet = Projet::factory()->create();
+        $chef = User::factory()->create(['role' => 'chef_projet']);
+        $projet->users()->attach($chef);
+
+        $this->actingAs($chef)->delete("/projects/{$projet->id}/membres/{$chef->id}");
+
+        $this->assertTrue($projet->fresh()->users->contains($chef));
     }
 }

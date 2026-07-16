@@ -53,11 +53,11 @@ class ProjetControllerTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_un_chef_de_projet_peut_creer_un_projet_et_en_devient_membre(): void
+    public function test_un_admin_peut_creer_un_projet_et_en_devient_membre(): void
     {
-        $chef = User::factory()->create(['role' => 'chef_projet']);
+        $admin = User::factory()->create(['role' => 'admin']);
 
-        $response = $this->actingAs($chef)->post('/projects', [
+        $response = $this->actingAs($admin)->post('/projects', [
             'nom' => 'Nouveau projet',
             'description' => 'Test',
         ]);
@@ -66,14 +66,14 @@ class ProjetControllerTest extends TestCase
         $this->assertDatabaseHas('projets', ['nom' => 'Nouveau projet']);
 
         $projet = Projet::where('nom', 'Nouveau projet')->first();
-        $this->assertTrue($projet->users->contains($chef));
+        $this->assertTrue($projet->users->contains($admin));
     }
 
     public function test_creer_un_projet_genere_les_trois_colonnes_par_defaut(): void
     {
-        $chef = User::factory()->create(['role' => 'chef_projet']);
+        $admin = User::factory()->create(['role' => 'admin']);
 
-        $this->actingAs($chef)->post('/projects', ['nom' => 'Test colonnes']);
+        $this->actingAs($admin)->post('/projects', ['nom' => 'Test colonnes']);
 
         $projet = Projet::where('nom', 'Test colonnes')->first();
         $this->assertCount(3, $projet->colonnes);

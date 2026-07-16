@@ -7,6 +7,7 @@ use App\Models\Projet;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Resources\TacheResource;
+use App\Models\User;
 
 class ProjetController extends Controller
 {
@@ -50,7 +51,7 @@ class ProjetController extends Controller
             'projet' => new ProjetResource($projet),
             'colonnes' => $projet->colonnes()->orderBy('ordre')->get(),
             'taches' => TacheResource::collection($projet->taches()->with('user')->get()),
-            'users' => $projet->users()->get(['users.id', 'users.name']),
+            'users' => $projet->users()->get(['users.id', 'users.name', 'users.role']),
         ]);
     }
 
@@ -75,5 +76,19 @@ class ProjetController extends Controller
         $projet->delete();
 
         return redirect('/projects');
+    }
+
+    public function removeMembre(Request $request, Projet $projet, User $user)
+    {
+        $this->authorize('manageMembers', $projet);
+
+        if ($projet->users()->count() <= 1) {
+            return back()->withErrors(['membre' => 'Impossible de retirer le dernier membre du projet.']);
+        }
+
+        $projet->users()->detach($user->id);
+        $projet->taches()->where('user_id', $user->id)->update(['user_id' => null]);
+
+        return back();
     }
 }

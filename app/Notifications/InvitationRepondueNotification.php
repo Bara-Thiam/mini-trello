@@ -4,7 +4,6 @@ namespace App\Notifications;
 
 use App\Models\Projet;
 use App\Models\User;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
@@ -32,10 +31,5 @@ class InvitationRepondueNotification extends Notification
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->toDatabase($notifiable));
-    }
-
-    public function broadcastOn(): array
-    {
-        return [new PrivateChannel('App.Models.User.' . $this->id)];
     }
 }

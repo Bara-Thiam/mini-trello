@@ -4,12 +4,14 @@ import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { usePage } from '@inertiajs/vue3'
 
+const page = usePage()
+const peutCreerProjet = computed(() => page.props.auth?.user?.role === 'admin')
+
 const props = defineProps({ projets: Array })
 
 const ACCENTS = ['bg-brand-500', 'bg-mint', 'bg-coral', 'bg-amber']
 function accentFor(id) { return ACCENTS[id % ACCENTS.length] }
 
-const page = usePage()
 const isAdmin = computed(() => page.props.auth?.user?.role === 'admin')
 
 const progressionMoyenne = computed(() => {
@@ -68,7 +70,7 @@ function supprimerProjet(projetId, event) {
             </div>
           </div>
         </div>
-        <button @click="ouvrirModal"
+        <button v-if="peutCreerProjet" @click="ouvrirModal"
           class="flex items-center gap-1.5 font-display font-semibold bg-white text-ink px-5 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-600">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
             class="w-4 h-4">
@@ -122,7 +124,7 @@ function supprimerProjet(projetId, event) {
         </div>
       </div>
 
-      <button @click="ouvrirModal"
+      <button v-if="peutCreerProjet" @click="ouvrirModal"
         class="border-2 border-dashed border-brand-200 rounded-xl flex flex-col items-center justify-center gap-2 py-8 text-ink-soft hover:border-brand-400 hover:text-brand-600 hover:bg-brand-50/50 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
           class="w-6 h-6">

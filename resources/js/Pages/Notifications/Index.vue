@@ -2,6 +2,27 @@
 import { computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { onMounted, onUnmounted } from 'vue'
+import { usePage } from '@inertiajs/vue3'
+
+const page = usePage()
+
+onMounted(() => {
+  const userId = page.props.auth?.user?.id
+  if (userId && window.Echo) {
+    window.Echo.private(`App.Models.User.${userId}`).notification(() => {
+      router.reload({ only: ['notifications'] })
+    })
+  }
+})
+
+onUnmounted(() => {
+  const userId = page.props.auth?.user?.id
+  if (userId && window.Echo) {
+    window.Echo.leave(`App.Models.User.${userId}`)
+  }
+})
+
 
 const props = defineProps({ notifications: Array })
 

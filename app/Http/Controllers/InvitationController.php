@@ -14,9 +14,7 @@ class InvitationController extends Controller
     {
         $this->authorize('view', $projet);
 
-        if (!in_array($request->user()->role, ['admin', 'chef_projet'])) {
-            abort(403, 'Seuls les chefs de projet et administrateurs peuvent inviter.');
-        }
+        $this->authorize('manageMembers', $projet);
 
         $validated = $request->validate(['email' => 'required|email|max:255']);
 

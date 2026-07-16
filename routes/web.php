@@ -41,4 +41,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects/{projet}/invitations', [InvitationController::class, 'store']);
     Route::post('/notifications/{notification}/accepter', [InvitationController::class, 'accepter']);
     Route::post('/notifications/{notification}/refuser', [InvitationController::class, 'refuser']);
+
+    Route::delete('/projects/{projet}/membres/{user}', [ProjetController::class, 'removeMembre']);
 });

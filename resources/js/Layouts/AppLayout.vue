@@ -1,6 +1,7 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3'
 import { computed, ref, watch } from 'vue'
+import { onMounted, onUnmounted} from 'vue'
 
 defineProps({
   title: { type: String, default: '' }
@@ -24,6 +25,24 @@ const isSidebarOpen = ref(false)
 function closeSidebar() { isSidebarOpen.value = false }
 // Ferme automatiquement la sidebar mobile après une navigation
 watch(currentPath, () => { isSidebarOpen.value = false })
+
+const localUnread = ref(page.props.unreadNotificationsCount ?? 0)
+
+onMounted(() => {
+  const userId = page.props.auth?.user?.id
+  if (userId && window.Echo) {
+    window.Echo.private(`App.Models.User.${userId}`).notification(() => {
+      localUnread.value++
+    })
+  }
+})
+
+onUnmounted(() => {
+  const userId = page.props.auth?.user?.id
+  if (userId && window.Echo) {
+    window.Echo.leave(`App.Models.User.${userId}`)
+  }
+})
 </script>
 
 <template>
@@ -93,9 +112,9 @@ watch(currentPath, () => { isSidebarOpen.value = false })
               d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
           </svg>
           Notifications
-          <span v-if="$page.props.unreadNotificationsCount > 0"
+          <span v-if="localUnread  > 0"
             class="ml-auto min-w-[18px] h-[18px] px-1 rounded-full bg-coral text-white text-[10px] font-bold flex items-center justify-center">
-            {{ $page.props.unreadNotificationsCount > 9 ? '9+' : $page.props.unreadNotificationsCount }}
+            {{ localUnread > 9 ? '9+' : localUnread }}
           </span>
         </Link>
 

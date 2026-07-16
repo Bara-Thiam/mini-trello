@@ -36,11 +36,16 @@ class ProjetPolicyTest extends TestCase
         $this->assertTrue($admin->can('view', $projet));
     }
 
-    public function test_un_chef_de_projet_peut_creer_un_projet(): void
+    public function test_un_chef_de_projet_ne_peut_pas_creer_de_projet(): void
     {
         $chef = User::factory()->create(['role' => 'chef_projet']);
+        $this->assertFalse($chef->can('create', Projet::class));
+    }
 
-        $this->assertTrue($chef->can('create', Projet::class));
+    public function test_un_admin_peut_creer_un_projet(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $this->assertTrue($admin->can('create', Projet::class));
     }
 
     public function test_un_membre_ne_peut_pas_creer_de_projet(): void

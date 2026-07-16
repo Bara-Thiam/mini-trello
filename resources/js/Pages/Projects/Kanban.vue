@@ -1,11 +1,11 @@
 <script setup>
-import { reactive, computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import axios from 'axios'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import KanbanColumn from '@/Components/Kanban/KanbanColumn.vue'
 import TaskForm from '@/Components/Kanban/TaskForm.vue'
 import { useForm } from '@inertiajs/vue3'
+import { reactive, computed, ref, watch } from 'vue'
 
 const props = defineProps({
   projet: Object,
@@ -14,16 +14,33 @@ const props = defineProps({
   users: Array,
 })
 
+const peutGererMembres = computed(() => {
+  const role = page.props.auth?.user?.role
+  return role === 'admin' || role === 'chef_projet'
+})
+
+const showMembresModal = ref(false)
+
+function retirerMembre(userId) {
+  if (confirm('Retirer cette personne du projet ? Ses tâches assignées seront désassignées.')) {
+    router.delete(`/projects/${props.projet.id}/membres/${userId}`, { preserveScroll: true })
+  }
+}
+
 const ORDRE_TO_STATUT = { 1: 'TODO', 2: 'DOING', 3: 'DONE' }
 
 const colonnesTriees = computed(() => [...props.colonnes].sort((a, b) => a.ordre - b.ordre))
 
 const tachesByColonne = reactive({})
-colonnesTriees.value.forEach(colonne => {
-  const statut = ORDRE_TO_STATUT[colonne.ordre]
-  tachesByColonne[colonne.id] = props.taches.filter(t => t.statut === statut)
-})
 
+function rebuildTachesByColonne() {
+  colonnesTriees.value.forEach(colonne => {
+    const statut = ORDRE_TO_STATUT[colonne.ordre]
+    tachesByColonne[colonne.id] = props.taches.filter(t => t.statut === statut)
+  })
+}
+
+watch(() => props.taches, rebuildTachesByColonne, { immediate: true, deep: true })
 const filtreUserId = ref('')
 const filtrePriorite = ref('')
 function tachesAffichees(colonneId) {
@@ -143,6 +160,15 @@ const peutInviter = computed(() => ['admin', 'chef_projet'].includes(page.props.
         </svg>
         Inviter
       </button>
+      <button @click="showMembresModal = true"
+        class="flex items-center gap-1.5 text-sm font-medium text-ink-soft hover:text-brand-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+          class="w-4 h-4">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+        </svg>
+        Membres ({{ users.length }})
+      </button>
       <div v-if="showInviteModal" class="fixed inset-0 bg-ink/50 flex items-center justify-center z-50 p-4"
         @click.self="showInviteModal = false">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6">
@@ -189,4 +215,32 @@ const peutInviter = computed(() => ['admin', 'chef_projet'].includes(page.props.
       </div>
     </div>
   </AppLayout>
+  <div v-if="showMembresModal" class="fixed inset-0 bg-ink/50 flex items-center justify-center z-50 p-4"
+    @click.self="showMembresModal = false">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6">
+      <h3 class="font-display text-lg font-bold text-ink mb-4">Membres du projet</h3>
+      <div class="flex flex-col gap-2">
+        <div v-for="user in users" :key="user.id" class="flex items-center justify-between gap-3 px-1 py-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <span
+              class="w-7 h-7 rounded-full bg-gradient-to-br from-brand-500 to-mint flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+              {{ user.name.charAt(0) }}
+            </span>
+            <span class="text-sm text-ink truncate">{{ user.name }}</span>
+          </div>
+          <button v-if="peutGererMembres && users.length > 1" @click="retirerMembre(user.id)"
+            class="text-ink-soft/40 hover:text-coral transition-colors flex-shrink-0" aria-label="Retirer du projet">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <button @click="showMembresModal = false"
+        class="w-full mt-4 text-sm font-medium text-ink-soft hover:text-ink transition-colors">
+        Fermer
+      </button>
+    </div>
+  </div>
 </template>

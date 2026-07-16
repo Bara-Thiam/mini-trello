@@ -23,7 +23,7 @@ class ProjetPolicy
 
     public function create(User $user): bool
     {
-        return in_array($user->role, ['admin', 'chef_projet']);
+        return $user->role === 'admin';
     }
 
     public function update(User $user, Projet $projet): bool
@@ -34,5 +34,14 @@ class ProjetPolicy
     public function delete(User $user, Projet $projet): bool
     {
         return $user->role === 'admin';
+    }
+
+    public function manageMembers(User $user, Projet $projet): bool
+    {
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return $user->role === 'chef_projet' && $projet->users()->where('users.id', $user->id)->exists();
     }
 }

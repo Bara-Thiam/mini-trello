@@ -1,4 +1,5 @@
 import { createApp, h } from 'vue';
+import './echo'
 import { createInertiaApp } from '@inertiajs/vue3';
 
 createInertiaApp({

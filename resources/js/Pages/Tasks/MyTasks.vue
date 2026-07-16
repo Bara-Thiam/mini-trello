@@ -7,6 +7,11 @@ const PRIORITE_STYLES = { HIGH: 'bg-coral/10 text-coral', MEDIUM: 'bg-amber/10 t
 const STATUT_STYLES = { DONE: 'bg-mint/10 text-mint', DOING: 'bg-amber/10 text-amber', TODO: 'bg-brand-50 text-ink-soft' }
 function prioriteClass(p) { return PRIORITE_STYLES[p] ?? 'bg-brand-50 text-ink-soft' }
 function statutClass(s) { return STATUT_STYLES[s] ?? 'bg-brand-50 text-ink-soft' }
+function estEnRetard(tache) {
+  if (!tache.echeance || tache.statut === 'DONE') return false
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  return new Date(tache.echeance) < today
+}
 </script>
 
 <template>
@@ -33,7 +38,7 @@ function statutClass(s) { return STATUT_STYLES[s] ?? 'bg-brand-50 text-ink-soft'
                         </svg>
                         {{ tache.projet?.nom ?? 'Projet inconnu' }}
                     </span>
-                    <span class="font-mono">{{ tache.echeance }}</span>
+                    <span :class="['font-mono', estEnRetard(tache) ? 'text-coral font-semibold' : '']">{{ tache.echeance }}</span>
                 </div>
             </div>
         </div>
