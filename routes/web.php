@@ -7,6 +7,7 @@ use App\Http\Controllers\TacheController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return redirect('/projects');
@@ -43,4 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/{notification}/refuser', [InvitationController::class, 'refuser']);
 
     Route::delete('/projects/{projet}/membres/{user}', [ProjetController::class, 'removeMembre']);
+
+    Route::get('/users', [UserController::class, 'index']);
+    Route::patch('/users/{user}/role', [UserController::class, 'updateRole']);
 });

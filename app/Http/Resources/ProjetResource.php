@@ -19,6 +19,11 @@ class ProjetResource extends JsonResource
                 'doing' => $this->taches->where('statut', 'DOING')->count(),
                 'done' => $this->taches->where('statut', 'DONE')->count(),
             ],
+            'apercu' => [
+                'todo' => $this->taches->where('statut', 'TODO')->take(3)->pluck('titre')->values(),
+                'doing' => $this->taches->where('statut', 'DOING')->take(3)->pluck('titre')->values(),
+                'done' => $this->taches->where('statut', 'DONE')->take(3)->pluck('titre')->values(),
+            ],
         ];
     }
 }

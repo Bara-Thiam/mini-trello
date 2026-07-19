@@ -38,6 +38,12 @@ function supprimerProjet(projetId, event) {
     router.delete(`/projects/${projetId}`)
   }
 }
+
+const hoveredProjetId = ref(null)
+
+function pluslong(colonne, count) {
+  return Math.max(0, count - colonne.length)
+}
 </script>
 
 <template>
@@ -84,8 +90,9 @@ function supprimerProjet(projetId, event) {
     <!-- Grille de projets -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
       <div v-for="projet in projets" :key="projet.id" @click="ouvrirProjet(projet.id)"
-        @keydown.enter="ouvrirProjet(projet.id)" tabindex="0" role="button"
-        class="bg-white rounded-xl border border-brand-100 overflow-hidden cursor-pointer shadow-[0_4px_16px_rgba(30,27,46,0.1)] hover:shadow-[0_16px_36px_rgba(30,27,46,0.2)] hover:-translate-y-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+        @keydown.enter="ouvrirProjet(projet.id)" @mouseenter="hoveredProjetId = projet.id"
+        @mouseleave="hoveredProjetId = null" tabindex="0" role="button"
+        class="relative bg-white rounded-xl border border-brand-100 cursor-pointer shadow-[0_4px_16px_rgba(30,27,46,0.1)] hover:shadow-[0_16px_36px_rgba(30,27,46,0.2)] hover:-translate-y-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
         <div class="p-5 relative">
           <button v-if="isAdmin" @click="(e) => supprimerProjet(projet.id, e)"
             class="absolute top-3 right-3 text-ink-soft/40 hover:text-coral transition-colors p-1"
@@ -120,6 +127,43 @@ function supprimerProjet(projetId, event) {
             <span class="font-mono text-[11px] text-ink-soft">{{ projet.repartition.todo }} ToDo · {{
               projet.repartition.doing }} Doing · {{ projet.repartition.done }} Done</span>
             <span class="font-mono text-xs font-bold text-ink">{{ projet.progression }}%</span>
+          </div>
+        </div>
+
+        <div v-if="hoveredProjetId === projet.id"
+          class="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl border border-brand-100 shadow-xl p-4 z-20"
+          @mouseenter="hoveredProjetId = projet.id" @mouseleave="hoveredProjetId = null">
+          <div class="grid grid-cols-3 gap-3 text-xs">
+            <div>
+              <p class="font-semibold text-ink-soft mb-1.5 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-ink-soft/50"></span> ToDo
+              </p>
+              <p v-for="titre in projet.apercu.todo" :key="titre" class="text-ink-soft truncate mb-0.5">{{ titre }}</p>
+              <p v-if="pluslong(projet.apercu.todo, projet.repartition.todo) > 0" class="text-ink-soft/60 italic">
+                +{{ pluslong(projet.apercu.todo, projet.repartition.todo) }} de plus
+              </p>
+              <p v-if="projet.repartition.todo === 0" class="text-ink-soft/40">Aucune</p>
+            </div>
+            <div>
+              <p class="font-semibold text-amber mb-1.5 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber"></span> Doing
+              </p>
+              <p v-for="titre in projet.apercu.doing" :key="titre" class="text-ink-soft truncate mb-0.5">{{ titre }}</p>
+              <p v-if="pluslong(projet.apercu.doing, projet.repartition.doing) > 0" class="text-ink-soft/60 italic">
+                +{{ pluslong(projet.apercu.doing, projet.repartition.doing) }} de plus
+              </p>
+              <p v-if="projet.repartition.doing === 0" class="text-ink-soft/40">Aucune</p>
+            </div>
+            <div>
+              <p class="font-semibold text-mint mb-1.5 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-mint"></span> Done
+              </p>
+              <p v-for="titre in projet.apercu.done" :key="titre" class="text-ink-soft truncate mb-0.5">{{ titre }}</p>
+              <p v-if="pluslong(projet.apercu.done, projet.repartition.done) > 0" class="text-ink-soft/60 italic">
+                +{{ pluslong(projet.apercu.done, projet.repartition.done) }} de plus
+              </p>
+              <p v-if="projet.repartition.done === 0" class="text-ink-soft/40">Aucune</p>
+            </div>
           </div>
         </div>
       </div>
