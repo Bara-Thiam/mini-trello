@@ -48,3 +48,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
     Route::patch('/users/{user}/role', [UserController::class, 'updateRole']);
 });
+
+Route::get('/taches/{tache}/historique', [TacheController::class, 'historique']);

@@ -41,6 +41,7 @@ function rebuildTachesByColonne() {
 }
 
 watch(() => props.taches, rebuildTachesByColonne, { immediate: true, deep: true })
+
 const filtreUserId = ref('')
 const filtrePriorite = ref('')
 function tachesAffichees(colonneId) {
@@ -51,6 +52,7 @@ function tachesAffichees(colonneId) {
   })
 }
 function resetFiltres() { filtreUserId.value = ''; filtrePriorite.value = '' }
+
 const filtresActifs = computed(() => filtreUserId.value !== '' || filtrePriorite.value !== '')
 
 function syncTachePosition(tache) {
@@ -88,8 +90,18 @@ const editingTache = ref(null)
 const targetColonneId = ref(null)
 
 function openCreateModal(colonneId) { editingTache.value = null; targetColonneId.value = colonneId; showModal.value = true }
-function openEditModal(tache) { editingTache.value = tache; targetColonneId.value = null; showModal.value = true }
-function closeModal() { showModal.value = false; editingTache.value = null; targetColonneId.value = null }
+function openEditModal(tache) {
+  editingTache.value = tache
+  targetColonneId.value = null
+  showModal.value = true
+  chargerHistorique(tache.id)
+}
+function closeModal() {
+  showModal.value = false
+  editingTache.value = null
+  targetColonneId.value = null
+  historique.value = []
+}
 
 function handleSubmit(formData) {
   const payload = {
@@ -114,6 +126,24 @@ function envoyerInvitation() {
 import { usePage } from '@inertiajs/vue3'
 const page = usePage()
 const peutInviter = computed(() => ['admin', 'chef_projet'].includes(page.props.auth?.user?.role))
+
+const historique = ref([])
+const chargementHistorique = ref(false)
+
+const LABELS_CHAMP = {
+  titre: 'Titre', description: 'Description', statut: 'Statut',
+  priorite: 'Priorité', echeance: 'Échéance', user_id: 'Assigné à',
+}
+
+async function chargerHistorique(tacheId) {
+  chargementHistorique.value = true
+  try {
+    const { data } = await axios.get(`/taches/${tacheId}/historique`)
+    historique.value = data
+  } finally {
+    chargementHistorique.value = false
+  }
+}
 </script>
 
 <template>
@@ -212,6 +242,22 @@ const peutInviter = computed(() => ['admin', 'chef_projet'].includes(page.props.
           {{ editingTache ? 'Modifier la tâche' : 'Nouvelle tâche' }}
         </h2>
         <TaskForm :users="users" :tache="editingTache" @submit="handleSubmit" @cancel="closeModal" />
+        <div v-if="editingTache" class="mt-6 pt-5 border-t border-brand-50">
+          <h4 class="font-display text-sm font-semibold text-ink mb-3">Historique</h4>
+          <p v-if="chargementHistorique" class="text-xs text-ink-soft">Chargement...</p>
+          <div v-else class="flex flex-col gap-2 max-h-48 overflow-y-auto">
+            <div v-for="a in historique" :key="a.id" class="text-xs text-ink-soft">
+              <span class="font-medium text-ink">{{ a.user }}</span>
+              <template v-if="a.type === 'creation'"> a créé la tâche</template>
+              <template v-else>
+                a modifié <span class="font-medium">{{ LABELS_CHAMP[a.champ] ?? a.champ }}</span>
+                <template v-if="a.ancienneValeur">: {{ a.ancienneValeur }} → {{ a.nouvelleValeur }}</template>
+                <template v-else>: {{ a.nouvelleValeur }}</template>
+              </template>
+              <span class="text-ink-soft/60"> · {{ a.creeLe }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </AppLayout>

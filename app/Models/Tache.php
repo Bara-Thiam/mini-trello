@@ -27,4 +27,44 @@ class Tache extends Model
             'echeance' => 'date',
         ];
     }
+
+    public function activites()
+    {
+        return $this->hasMany(Activite::class)->latest();
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (Tache $tache) {
+            $tache->activites()->create([
+                'user_id' => auth()->id(),
+                'type' => 'creation',
+            ]);
+        });
+
+        static::updating(function (Tache $tache) {
+            $champsSuivis = ['titre', 'description', 'statut', 'priorite', 'echeance', 'user_id'];
+
+            foreach ($tache->getDirty() as $champ => $nouvelle) {
+                if (!in_array($champ, $champsSuivis)) {
+                    continue;
+                }
+
+                $ancienne = $tache->getOriginal($champ);
+
+                if ($champ === 'user_id') {
+                    $ancienne = $ancienne ? \App\Models\User::find($ancienne)?->name : null;
+                    $nouvelle = $nouvelle ? \App\Models\User::find($nouvelle)?->name : null;
+                }
+
+                $tache->activites()->create([
+                    'user_id' => auth()->id(),
+                    'type' => 'modification',
+                    'champ' => $champ,
+                    'ancienne_valeur' => $ancienne,
+                    'nouvelle_valeur' => $nouvelle,
+                ]);
+            }
+        });
+    }
 }

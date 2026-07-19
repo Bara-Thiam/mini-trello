@@ -88,4 +88,19 @@ class TacheController extends Controller
             'taches' => TacheResource::collection($taches),
         ]);
     }
+
+    public function historique(Tache $tache)
+    {
+        $this->authorize('view', $tache);
+
+        return $tache->activites()->with('user')->get()->map(fn($a) => [
+            'id' => $a->id,
+            'type' => $a->type,
+            'champ' => $a->champ,
+            'ancienneValeur' => $a->ancienne_valeur,
+            'nouvelleValeur' => $a->nouvelle_valeur,
+            'user' => $a->user?->name ?? 'Utilisateur supprimé',
+            'creeLe' => $a->created_at->diffForHumans(),
+        ]);
+    }
 }
